@@ -1,0 +1,47 @@
+= Timestamped SNAPSHOTs do not guarantee reproducibility
+
+An example:
+Let's have a simple war project [1] that depends on `hawkular-inventory-impl-tinkerpop`
+
+[source,xml]
+----
+<dependencies>
+  <dependency>
+    <groupId>org.hawkular.inventory</groupId>
+    <artifactId>hawkular-inventory-impl-tinkerpop</artifactId>
+    <version>0.2.1-20150818.120735-14</version>
+  </dependency>
+</dependencies>
+----
+
+Note that `hawkular-inventory-impl-tinkerpop` depends on `hawkular-inventory-api` which is another artifact from the
+same group `org.hawkular.inventory`.
+
+If we use version `0.2.1-20150818.120735-14` which happens to be the *last* available snapshot in the repo [2], all is
+well: when we open the war and check the `Built-From-Git-SHA1` entries in `MANIFEST.MF` of
+`hawkular-inventory-impl-tinkerpop-\*.jar` and `hawkular-inventory-api-\*.jar` they both have the same value
+`90a594475048a7a81a5557a96ecd367cf6cc1d6c`.
+
+But, let's say that we need to downgrade `hawkular-inventory-impl-tinkerpop` to an older version `20150817.100338-13`
+for some reason:
+
+[source,xml]
+----
+<dependencies>
+  <dependency>
+    <groupId>org.hawkular.inventory</groupId>
+    <artifactId>hawkular-inventory-impl-tinkerpop</artifactId>
+    <version>20150817.100338-13</version>
+  </dependency>
+</dependencies>
+----
+
+The war file built with `hawkular-inventory-impl-tinkerpop:20150817.100338-13` contains
+`hawkular-inventory-impl-tinkerpop-\*.jar` with `Built-From-Git-SHA1` `c41249a9e45e3d5ed2cf2299db09463e339105e0` as
+expected, but contains `hawkular-inventory-api-\*.jar` `90a594475048a7a81a5557a96ecd367cf6cc1d6c`
+which corresponds to the *latest* snapshot `0.2.1-20150818.120735-14` rather than `20150817.100338-13`. This makes the
+build non-deterministic.
+
+[1] https://github.com/ppalaga/snapshottest/blob/master/pom.xml#L40
+
+[2] https://repository.jboss.org/nexus/content/groups/public/org/hawkular/inventory/hawkular-inventory-impl-tinkerpop/0.2.1-SNAPSHOT/
