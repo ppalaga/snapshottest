@@ -37,7 +37,7 @@
     <dependency>
       <groupId>org.hawkular.inventory</groupId>
       <artifactId>hawkular-inventory-impl-tinkerpop</artifactId>
-      <version>0.2.1-SNAPSHOT</version>
+      <version>0.2.1-20150818.120735-14</version>
     </dependency>
   </dependencies>
 
